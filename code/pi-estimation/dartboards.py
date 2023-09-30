@@ -27,8 +27,9 @@ dartboard.add_patch(Polygon([(-1,-1), (1,-1), (1,1), (-1,1)], facecolor="None", 
 dartboard.add_patch(Circle((0,0), 1, facecolor="None", edgecolor="k", lw=2, ls=":"))
 dartboard.axis("off")
 
-estimate.set_ylim(3-epsilon, 3.5+epsilon)
-estimate.set_yticks([3, np.pi, 3.5], [r"$3$", r"$\pi$", r"$3.5$"])
+bottom, top = 3, 3.3
+estimate.set_ylim(bottom-epsilon, top+epsilon)
+estimate.set_yticks([bottom, np.pi, top], [rf"${str(bottom)}$", r"$\pi$", rf"${str(top)}$"])
 estimate.axhspan(np.pi-epsilon, np.pi+epsilon, color=latex["Amber"], alpha=1/8)
 estimate.axhline(y=np.pi, ls=":", lw=1, color=latex["Amethyst"])
 
@@ -56,6 +57,6 @@ with tqdm(total=len(trials)) as bar:
 
         # Write to file if the interval's right.
         if not (stamp % interval):
-            plt.savefig(f"output/figures/dartboards/{str(stamp).zfill(6)}.jpg", dpi=200, bbox_inches="tight")
+            plt.savefig(f"output/figures/dartboards/{str(stamp).zfill(6)}.jpg", dpi=300, bbox_inches="tight")
 
         bar.update()

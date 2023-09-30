@@ -1,9 +1,13 @@
 
-# If we pass the "clean" key, then we delete all the existing images.
-if [ "$1" == "clean" ]; then
+# If we pass the "fresh" key, then we delete all the existing images --- a fresh
+# start.
+if [ "$1" == "fresh" ]; then
     rm -rf output/figures/dartboards/*.*g
     python dartboards.py;
 fi
 
 # Convert all the images to gifs.
-convert -resize 35% -delay 8 -loop 0 -deconstruct output/figures/dartboards/*.jpg output/figures/dartboard.gif
+cd output/figures/
+# convert -delay 8 -loop 0 -deconstruct dartboards/*.jpg _dartboards.gif
+gifsicle --resize 800x_ --colors 16 _dartboards.gif > dartboards.gif
+
