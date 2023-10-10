@@ -1,0 +1,26 @@
+Algorithm ChernoffEstimationWithProbability(p, δ):
+    Initialize count_success = 0
+    Initialize total_trials = 0
+    
+    while true:
+        total_trials = total_trials + 1
+        Generate a random sample X from the distribution with success probability p
+        
+        # Check if the sample is a success
+        if X is a success:
+            count_success = count_success + 1
+        
+        # Estimate the success rate
+        estimated_success_rate = count_success / total_trials
+        
+        # Calculate the upper bound using Chernoff bound
+        upper_bound = exp(-2 * total_trials * (estimated_success_rate - p)^2 / p)
+        
+        # Check if the upper bound is less than or equal to δ
+        if upper_bound <= δ:
+            # If the estimated success rate is within δ, return the estimate
+            return estimated_success_rate
+# n this version of the algorithm, we introduce a parameter p to represent the specified success 
+# probability. The algorithm follows a similar structure to the previous version but calculates the upper bound using Chernoff bound based on the specified 
+# p. The termination and correctness properties remain similar to the previous algorithm, but now the success probability 
+# p is used for calculations and comparisons.
