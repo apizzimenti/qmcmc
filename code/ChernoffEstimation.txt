@@ -1,0 +1,32 @@
+Algorithm ChernoffEstimation(δ):
+    Initialize count_success = 0
+    Initialize total_trials = 0
+    
+    while true:
+        total_trials = total_trials + 1
+        Generate a random sample X from the distribution
+        
+        # Check if the sample is a success
+        if X is a success:
+            count_success = count_success + 1
+        
+        # Estimate the success rate
+        estimated_success_rate = count_success / total_trials
+        
+        # Calculate the upper bound using Chernoff bound
+        upper_bound = exp(-2 * total_trials * (estimated_success_rate - (2/3))^2)
+        
+        # Check if the upper bound is less than or equal to δ
+        if upper_bound <= δ:
+            # If the estimated success rate is within δ, return the estimate
+            return estimated_success_rate
+
+# Using Chernoff bound, we calculate an upper bound on the probability that the estimated success rate
+# deviates significantly from 2/3. If this upper bound is less than or equal to δ, we return the estimated
+# success rate as the output. The algorithm is designed to succeed 2/3 of the time with a probability of at
+# least 1 - δ.
+
+
+
+
+
