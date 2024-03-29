@@ -1,0 +1,50 @@
+\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
+\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+								% TeX will automatically convert eps --> pdf in pdflatex		
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+\usepackage{algpseudocodex}
+
+\title{Parallel Tempering Pseudocode}
+\author{}
+\date{}
+
+\def\R{\mathbb R}
+
+\begin{document}
+\maketitle
+
+Let $S$ be an arboitrary state space with an associated cost function $\omega\colon S\rightarrow\R$ and a set of transitions $E \subseteq S\times S$. Let $V = \{ \omega(s) \colon s\in S\}$. Then $G=(V,E)$ is a network of weighted states and transitions.
+
+Let $T$ be a finite subset of real numbers (representing the "energy" of a replica).
+
+Let $L$ be a natural number (representing the number of independent transitions prior to a "neighbor swap").
+
+Let $R$ be an ordering of $\{ 1, \ldots, |T| - 1\}$ (representing an ordering of the replicas).
+
+\vspace{1cm}
+
+\begin{algorithmic}
+\State Let $\delta_1 =  \delta_2 = \cdots = v$, where $v$ is a uniform randomly selected element of $V$.
+\Loop \;an arbitrary number of times
+	\ForAll{$i\in \{1, \ldots, |T| \}$}
+		\Loop \;$L$ times
+			\State Let $\delta'$ be a uniform randomly chosen neighbor of $\delta_i$.
+			\State Let $p = \min\{1, \exp\left[ (1/T_i) (\omega(\delta_i) - \omega(\delta')) \right] \}$
+			\State Let $\delta_i = \delta'$ with probability $p$.
+		\EndLoop
+	\EndFor
+	\State
+	\ForAll{$i\in R$}
+		\State Let $p = \min\{1, \exp\left[ (1/T_i -1/T_{i+1} (\omega(\delta_i) - \omega(\delta_{i+1})) \right] \}$
+		\State Swap $\delta_i, \delta_{i+1}$ with probability $p$.
+	\EndFor
+\EndLoop
+				
+\end{algorithmic}
+
+
+\end{document}  
