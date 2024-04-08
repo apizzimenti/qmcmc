@@ -10,7 +10,7 @@ void ParallelTempering(std::vector<double>& delta, std::vector<double>& T, int L
 
 // Assuming the return type is void for generateNeighbor and the arguments are as needed. Adjust if necessary.
 // Also, assuming generateNeighbor modifies its argument by reference.
-void generateNeighbor(double& value);
+void generateNeighbor(double* value);
 
 // Assuming temperedCost takes a double and returns a double. Adjust as necessary.
 double temperedCost(double value);

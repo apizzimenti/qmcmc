@@ -2,7 +2,7 @@
 CXX := g++
 
 # Compiler flags
-CXXFLAGS := -std=c++11
+CXXFLAGS := -std=c++11 -g
 
 # Files
 SRCS := $(wildcard ./*.cpp)
