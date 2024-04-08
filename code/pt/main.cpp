@@ -1,4 +1,4 @@
-#include "ParallelTempering.h"
+#include "ParallelTempering.hpp"
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -19,7 +19,8 @@ void generateNeighbor(double& value) {
     value += distribution(generator);
 }
 
-void ParallelTempering(std::vector<double>& delta, std::vector<double>& T, int L, std::vector<int>& R) {
+void ParallelTempering(std::vector<double>& delta, std::vector<double>& T, 
+		int L, std::vector<int>& R) {
     static std::mt19937 rng(std::random_device{}()); // Random number generator
     std::uniform_real_distribution<double> uni(0.0, 1.0);
 
