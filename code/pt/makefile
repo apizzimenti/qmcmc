@@ -29,4 +29,4 @@ $(BINDIR):
 
 # Clean up
 clean:
-	rm -rf $(BINDIR)
+	rm main

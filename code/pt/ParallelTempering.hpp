@@ -15,4 +15,13 @@ void generateNeighbor(double* value);
 // Assuming temperedCost takes a double and returns a double. Adjust as necessary.
 double temperedCost(double value);
 
+// Toggle outputting debug statements to a 'log.txt' file. 1 is assert, 0 is deassert.
+#define DEBUG 1
+
+#if DEBUG
+	#define DEBUG_CMD(...) do {__VA_ARGS__;} while(0)
+#else
+	#define DEBUG_CMD(...)
+#endif
+
 #endif // PARALLEL_TEMPERING_H
