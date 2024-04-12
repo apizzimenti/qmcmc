@@ -3,7 +3,8 @@
 #include <vector>
 #include <cmath>
 #include <random>
-#include <fstream> // For std::coutging
+#include <fstream>
+#include <time.h>
 #include <stdexcept> // For runtime exception
 
 
@@ -26,7 +27,7 @@ void generateNeighbor(double* value) {
 }
 
 void ParallelTempering(std::vector<double>& delta, std::vector<double>& T, 
-		int L, std::vector<int>& R) {
+		int L, std::vector<int>& R, std::ofstream& log) {
 
 	// Make sure T, R, and delta have same size
 	if ( (delta.size() != T.size()) ||
@@ -37,7 +38,7 @@ void ParallelTempering(std::vector<double>& delta, std::vector<double>& T,
 
 
 	if (DEBUG) {
-		std::cout << "I'm in debug mode!\n";
+		log << "I'm in debug mode!\n";
 	}
 
 
@@ -49,37 +50,39 @@ void ParallelTempering(std::vector<double>& delta, std::vector<double>& T,
             for (int j = 0; j < 5; ++j) {
                 auto delta_prime = delta[i];
 				if (DEBUG) {
-					std::cout << "Working with " << delta_prime << "...\n";
+					log << "Working with " << delta_prime << " ...\n";
 				}
 
                 generateNeighbor(&delta_prime);
 				if (DEBUG) {
-					std::cout << "Proposed update is " << delta_prime << "\n";
-					std::cout << "Cost of original is " << temperedCost(delta[i]) << '\n';
-					std::cout << "Cost of proposed is " << temperedCost(delta_prime) << '\n';
+					log << "Proposed update is " << delta_prime << '\n';
+					log << "Cost of original is " << temperedCost(delta[i]) << '\n';
+					log << "Cost of proposed is " << temperedCost(delta_prime) << '\n';
 				}
 
 
                 double costDiff = temperedCost(delta[i]) - temperedCost(delta_prime);
-				if (DEBUG) {
-					std::cout << "Cost difference is " << costDiff << '\n';
-				}
 				double p = std::exp((1.0 / T[i]) * 
-						(temperedCost(delta[R[i]]) - temperedCost(delta_prime)));
+						(temperedCost(delta[i]) - temperedCost(delta_prime)));
+
+				if (DEBUG) {
+					log << "Probability is " << fmin(1, p) << '\n';
+				}
+
                 if (uni(rng) < p) {
                     delta[i] = delta_prime;
 					if (DEBUG) {
-						std::cout << "Accepted!\n";
+						log << "Accepted!\n";
 					}
                 }
 				else {
 					if (DEBUG) {
-						std::cout << "Not Accepted....\n";
+						log << "Not Accepted....\n";
 					}
 				}
 
 				if (DEBUG) {
-					std::cout << std::endl;
+					log << std::endl;
 				}
             }
 
@@ -89,36 +92,39 @@ void ParallelTempering(std::vector<double>& delta, std::vector<double>& T,
 				double p = std::exp((1.0 / T[R[i]]) - (1.0 / T[R[i] + 1]) * 
 						(temperedCost(delta[R[i]]) - temperedCost(delta[R[i] + 1])));
 				if (DEBUG) {
-					std::cout << "Proposed swap " << delta[R[i]] 
+					log << "Proposed swap " << delta[R[i]] 
 						<< " and " << delta[R[i] +1] << " with probability "
-						<< p << '\n';
+						<< fmin(1, p) << '\n';
 				}
 				if (uni(rng) < p) {
 					std::swap(delta[R[i]], delta[R[i] + 1]);
 					if (DEBUG) {
-						std::cout << "Accepted!\n";
+						log << "Accepted!\n";
 					}
 				}
 				else {
 					if (DEBUG) {
-						std::cout << "Not Accepted....\n";
+						log << "Not Accepted....\n";
 					}
 				}
-				std::cout << std::endl;
+				log << std::endl;
 			}
         }
     }
 }
 
-int main() {
+int main(int argc, char *argv[]) {
     std::vector<double> delta = {5, 5, 5, 5, 5}; // Input actual data
     std::vector<double> T = {1, 2, 3, 4, 5}; // Temperatures
     std::vector<int> R = {1, 2, 3, 4, 5}; // Indices for swapping
-	std::ofstream log("log.txt");
-	log << "poop\n";
-	log.close();
 
-    ParallelTempering(delta, T, 0, R);
+	std::ofstream log;
+	log.open("log.txt");
+	time_t cur_time = time(NULL);
+
+	log << "Starting logging at " << asctime(localtime(&cur_time)) << '\n';
+
+    ParallelTempering(delta, T, 0, R, log);
     // Example output. Also placeholder. Replace later
     std::cout << "Final states of delta after Parallel Tempering:" << std::endl;
     for (auto val : delta) {

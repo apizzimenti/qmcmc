@@ -6,7 +6,7 @@
 #include <random>
 
 // Assuming delta's type is std::vector<double>. Adjust if necessary.
-void ParallelTempering(std::vector<double>& delta, std::vector<double>& T, int L, std::vector<int>& R);
+void ParallelTempering(std::vector<double>& delta, std::vector<double>& T, int L, std::vector<int>& R, FILE* log);
 
 // Assuming the return type is void for generateNeighbor and the arguments are as needed. Adjust if necessary.
 // Also, assuming generateNeighbor modifies its argument by reference.
