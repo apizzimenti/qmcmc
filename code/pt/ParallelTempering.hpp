@@ -6,7 +6,8 @@
 #include <random>
 
 // Assuming delta's type is std::vector<double>. Adjust if necessary.
-void ParallelTempering(std::vector<double>& delta, std::vector<double>& T, int L, std::vector<int>& R, FILE* log);
+template<class V>
+void ParallelTempering(int n, int m, std::vector<double> T, V& s, double (*temperedCost)(V, double), V (*getCandidate)(V));
 
 // Assuming the return type is void for generateNeighbor and the arguments are as needed. Adjust if necessary.
 // Also, assuming generateNeighbor modifies its argument by reference.
@@ -23,5 +24,16 @@ double temperedCost(double value);
 #else
 	#define DEBUG_CMD(...)
 #endif
+
+
+#define RECORD 1
+
+
+//void record(int num, char* msg, FILE* log) {
+//	static std::vector<int> line_loc
+//	if (vector.size() < num) {
+//		line_loc.resize(num+1)
+//	}
+//}
 
 #endif // PARALLEL_TEMPERING_H

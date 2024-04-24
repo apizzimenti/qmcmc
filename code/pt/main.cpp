@@ -6,7 +6,7 @@
 #include <fstream> // For std::coutging
 #include <stdexcept> // For runtime exception
 
-double bouncyFunctionCost(double x) {
+double bouncyFunctionCost(double x, double imstupidanddontdoanything) {
 	if (x < 0 || x > 3.14) {
 		return 1000;
 	}
@@ -16,6 +16,15 @@ double bouncyFunctionCost(double x) {
 		y += (10.0-n)*cos(20.0*n*(1.0/5.0));
 	}
 	return y;
+}
+
+double calculate_expression(double x, double dummy) {
+    double result;
+    double term1 = 0.5 * pow((x - 2), 4);
+    double term2 = 2 * pow((x - 2), 3);
+    double term3 = 3 * (x - 2);
+    result = term1 - term2 + term3;
+    return result;
 }
 
 double update(double x) {
@@ -32,8 +41,11 @@ double update(double x) {
 // n is current stopping condition
 template<class V>
 V parallelTempering(int n, int m, std::vector<double>& T, V& s, double (*temperedCost)(V, double), V (*getCandidate)(V)) {
+	// Make an rng
+	auto gen = std::mt19937(std::random_device{}());
+
     // edge cases
-    if (T.length() == 0) {
+    if (T.size() == 0) {
         return NULL;
     }
     
@@ -44,8 +56,13 @@ V parallelTempering(int n, int m, std::vector<double>& T, V& s, double (*tempere
     };
     std::vector<walker> W;
     for (auto &&t : T) {
-        walkers.push_back({t, s});
+        W.push_back({t, s});
     }
+	for (int i = 0; i < W.size(); i++) {
+		double tmp_cost = temperedCost(W[i].v, 0);
+		printf("%d:%.3lf\n", i, tmp_cost);
+	}
+
     
     // loop until stopping condition is met
     for (int i = 0; i < n; i++) {
@@ -53,20 +70,25 @@ V parallelTempering(int n, int m, std::vector<double>& T, V& s, double (*tempere
         for (auto &&w: W) {
             // propose m updates
             for (int j = 0; j < m; j++) {
-                V u = getCandidate(w.v)
-                if (std::uniform_real_distribution<double>(0.0,1.0)(std::random_device{}())
-                    < temperedCost(u.v, w.t)/temperedCost(w.v, w.t)) {
+                V u = getCandidate(w.v);
+                if (std::uniform_real_distribution<double>(0.0,1.0)(gen)
+                    < temperedCost(u, w.t)/temperedCost(w.v, w.t)) {
                     w.v = u;
                 }
+				double tmp_cost = temperedCost(W[i].v, 0);
+				printf("%d:%.3lf\n", j, tmp_cost);
             }
         }
         // odd even style sorting temperatures
-        for (int j = 0; j < W.length() - 1; j++) {
+        for (int j = 0; j < W.size() - 1; j++) {
             if (i % 2 == j % 2) {
-                if (std::uniform_real_distribution<double>(0.0,1.0)(std::random_device{}())
+                if (std::uniform_real_distribution<double>(0.0,1.0)(gen)
                     < temperedCost(W[i+1].v,W[i+1].t)/temperedCost(W[i].v,W[i].t)) {
-                    std::swap(W[i], W[i+1])
+                    std::swap(W[i], W[i+1]);
                 }
+
+				double tmp_cost = temperedCost(W[i].v, 0);
+				printf("%d:%.3lf\n", j, tmp_cost);
             }
         }
     }
@@ -74,12 +96,12 @@ V parallelTempering(int n, int m, std::vector<double>& T, V& s, double (*tempere
 	// calculate and return current min cost vertex
     V minCostV = W.at(0).v;
     for (auto &&w : W) {
-        if (temperedCost(w.v) < temperedCost(minCostV)) {
-            minCostV = w.v
+        if (temperedCost(w.v, 0) < temperedCost(minCostV, 0)) {
+            minCostV = w.v;
         }
-        else if (temperedCost(w.v) == minCostV) {
-            if (std::uniform_real_distribution<double>(0.0,1.0)(std::random_device{}()) < .5) {
-                minCostV = w.v
+        else if (temperedCost(w.v, 0) == minCostV) {
+            if (std::uniform_real_distribution<double>(0.0,1.0)(gen) < .5) {
+                minCostV = w.v;
             }
         }
     }
@@ -91,7 +113,8 @@ V parallelTempering(int n, int m, std::vector<double>& T, V& s, double (*tempere
 int main() {
 	std::vector<double> T = {.25, .5, .75, 1.0, 1.25};
 	double startingVal = .6;
-	parallelTempering(50, 5, T, startingVal, bouncyFunctionCost, update);
+	auto p = parallelTempering<double>(50, 5, T, startingVal, calculate_expression, update);
+	std::cout << p << std::endl;
 	return 0;
 }
 
