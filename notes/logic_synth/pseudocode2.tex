@@ -1,12 +1,7 @@
-\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
-\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
-\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
-\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
-								% TeX will automatically convert eps --> pdf in pdflatex		
-\usepackage{amssymb}
-\usepackage{amsmath}
-
-\usepackage{algpseudocodex}
+\documentclass[11pt]{article}
+\usepackage{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{algpseudocode}
 
 \title{Parallel Tempering Pseudocode}
 \author{}
@@ -17,7 +12,7 @@
 \begin{document}
 \maketitle
 
-Let $S$ be an arboitrary state space with an associated cost function $\omega\colon S\rightarrow\R$ and a set of transitions $E \subseteq S\times S$. Let $V = \{ \omega(s) \colon s\in S\}$. Then $G=(V,E)$ is a network of weighted states and transitions.
+Let $S$ be an arbitrary state space with an associated cost function $\omega\colon S\rightarrow\R$ and a set of transitions $E \subseteq S\times S$. Let $V = \{ \omega(s) \colon s\in S\}$. Then $G=(V,E)$ is a network of weighted states and transitions.
 
 Let $T$ be a finite subset of real numbers (representing the "energy" of a replica).
 
