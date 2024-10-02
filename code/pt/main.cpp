@@ -5,38 +5,8 @@
 #include <random>
 #include <fstream> // For std::coutging
 #include <stdexcept> // For runtime exception
-
-double bouncyFunctionCost(double x, double imstupidanddontdoanything) {
-	if (x < 0 || x > 3.14) {
-		return 1000;
-	}
-	double y = 0.0;
-	for (int n = 0; n < 5; n++) {
-		y += (10.0-n)*sin(20.0*n*(1.0/5.0));
-		y += (10.0-n)*cos(20.0*n*(1.0/5.0));
-	}
-	return y;
-}
-
-double calculate_expression(double x, double dummy) {
-    double result;
-    double term1 = 0.5 * pow((x - 2), 4);
-    double term2 = 2 * pow((x - 2), 3);
-    double term3 = 3 * (x - 2);
-    result = term1 - term2 + term3;
-    return result;
-}
-
-double update(double x) {
-    static std::mt19937 rng(std::random_device{}()); // Random number generator
-    std::uniform_real_distribution<double> uni(0.0, 1.0);
-	if (uni(rng) < .5) {
-		return x += .1;
-	}
-	else {
-		return x -= .1;
-	}
-}
+#include <omp.h>
+#include "bouncyFunc.h"
 
 // n is current stopping condition
 template<class V>
@@ -45,9 +15,9 @@ V parallelTempering(int n, int m, std::vector<double>& T, V& s, double (*tempere
 	auto gen = std::mt19937(std::random_device{}());
 
     // edge cases
-    if (T.size() == 0) {
-        return NULL;
-    }
+    // if (T.size() == 0) {
+    //     return NUL;
+    // }
     
     // define and initialize walkers
     struct walker {
@@ -65,8 +35,11 @@ V parallelTempering(int n, int m, std::vector<double>& T, V& s, double (*tempere
 
     
     // loop until stopping condition is met
+
     for (int i = 0; i < n; i++) {
         // for each walker
+        #pragma omp parallel
+        {
         for (auto &&w: W) {
             // propose m updates
             for (int j = 0; j < m; j++) {
@@ -78,6 +51,7 @@ V parallelTempering(int n, int m, std::vector<double>& T, V& s, double (*tempere
 				double tmp_cost = temperedCost(W[i].v, 0);
 				printf("%d:%.3lf\n", j, tmp_cost);
             }
+        }
         }
         // odd even style sorting temperatures
         for (int j = 0; j < W.size() - 1; j++) {
@@ -240,4 +214,3 @@ int main() {
 
 //     return 0;
 // }
-
