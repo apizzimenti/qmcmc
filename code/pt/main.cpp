@@ -5,7 +5,7 @@
 #include <random>
 #include <fstream> // For std::coutging
 #include <stdexcept> // For runtime exception
-#include <omp.h>
+#include <omp.h> // For parallel computing
 #include "bouncyFunc.h"
 
 // n is the current stopping condition
@@ -53,27 +53,33 @@ V parallelTempering(int n, int m, std::vector<double>& T, V& s, double (*tempere
             }
         }
         }
-        // odd even style sorting temperatures
+        // odd-even style sorting temperatures
         for (int j = 0; j < W.size() - 1; j++) {
+	   // Check if both indices i and j are even or odd
             if (i % 2 == j % 2) {
+		 // Generate a uniform random number in the range [0,1]
                 if (std::uniform_real_distribution<double>(0.0,1.0)(gen)
                     < temperedCost(W[i+1].v,W[i+1].t)/temperedCost(W[i].v,W[i].t)) {
-                    std::swap(W[i], W[i+1]);
+                    std::swap(W[i], W[i+1]); // Swap adjacent walkers based on their temperatures
                 }
-
+                                // Output temporary cost (debug feature)
 				double tmp_cost = temperedCost(W[i].v, 0);
 				printf("%d:%.3lf\n", j, tmp_cost);
             }
         }
     }
 	
-	// calculate and return current min cost vertex
-    V minCostV = W.at(0).v;
+// Calculate and return the current vertex (state) with the minimum cost
+    V minCostV = W.at(0).v; // Initialize with the first vertex in the walkers list
     for (auto &&w : W) {
+	// If the cost of the current walker's vertex is less than the current minimum cost vertex
         if (temperedCost(w.v, 0) < temperedCost(minCostV, 0)) {
+	    // Update minCostV to be the vertex with the lower cost
             minCostV = w.v;
         }
+	// If the costs are equal, randomly choose between the current and minCostV
         else if (temperedCost(w.v, 0) == minCostV) {
+	 // Generate a random number in the range [0,1] and pick the current vertex with 50% probability
             if (std::uniform_real_distribution<double>(0.0,1.0)(gen) < .5) {
                 minCostV = w.v;
             }
@@ -85,10 +91,18 @@ V parallelTempering(int n, int m, std::vector<double>& T, V& s, double (*tempere
 
 
 int main() {
-	std::vector<double> T = {.25, .5, .75, 1.0, 1.25};
-	double startingVal = .6;
+	std::vector<double> T = {.25, .5, .75, 1.0, 1.25}; // Define a vector of temperatures for the tempering process
+	double startingVal = .6; // Initialize the starting value for the state
+
+	// Call the parallel tempering function with:
+	// - 50 iterations
+	// - 5 updates per walker
+	// - Temperature vector T
+	// - Initial state startingVal
+	// - Function calculate_expression as the cost function
+	// - Function update to generate candidate states
 	auto p = parallelTempering<double>(50, 5, T, startingVal, calculate_expression, update);
-	std::cout << p << std::endl;
+	std::cout << p << std::endl; // Output the result of the parallel tempering process
 	return 0;
 }
 
