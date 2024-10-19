@@ -8,46 +8,46 @@
 #include <omp.h>
 #include "bouncyFunc.h"
 
-// n is current stopping condition
+// n is the current stopping condition
 template<class V>
 V parallelTempering(int n, int m, std::vector<double>& T, V& s, double (*temperedCost)(V, double), V (*getCandidate)(V)) {
-	// Make an rng
+	// Random Number Generator
 	auto gen = std::mt19937(std::random_device{}());
-
-    // edge cases
-    // if (T.size() == 0) {
-    //     return NUL;
-    // }
     
-    // define and initialize walkers
+    //Define and initialize walkers (states of the system)
     struct walker {
-        double t;
-        V v;
+        double t; // Temperature for walker
+        V v; // State of the system
     };
     std::vector<walker> W;
+	
+    // Initialize walkers with each temperature
     for (auto &&t : T) {
         W.push_back({t, s});
     }
+	// Output the initial tempered costs for each walker
 	for (int i = 0; i < W.size(); i++) {
 		double tmp_cost = temperedCost(W[i].v, 0);
 		printf("%d:%.3lf\n", i, tmp_cost);
 	}
 
-    
-    // loop until stopping condition is met
-
+     // Loop until the stopping condition is met
     for (int i = 0; i < n; i++) {
-        // for each walker
+         // Parallel section using OpenMP
         #pragma omp parallel
         {
+	// For each walker in the parallelized loop
         for (auto &&w: W) {
-            // propose m updates
+            // Propose m updates for the current walker
             for (int j = 0; j < m; j++) {
+		// Generate a candidate new state
                 V u = getCandidate(w.v);
+		// Perform Metropolis acceptance check using the tempered cost
                 if (std::uniform_real_distribution<double>(0.0,1.0)(gen)
                     < temperedCost(u, w.t)/temperedCost(w.v, w.t)) {
-                    w.v = u;
+                    w.v = u; // Accept the new state if the condition is met
                 }
+		                // Output temporary cost (debug feature)
 				double tmp_cost = temperedCost(W[i].v, 0);
 				printf("%d:%.3lf\n", j, tmp_cost);
             }
