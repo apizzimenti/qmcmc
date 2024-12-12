@@ -7,7 +7,7 @@
 
 // Assuming delta's type is std::vector<double>. Adjust if necessary.
 template<class V>
-void ParallelTempering(int n, int m, std::vector<double> T, V& s, double (*temperedCost)(V, double), V (*getCandidate)(V));
+std::vector<V> parallelTempering(int n, int m, std::vector<double>& temperatures, std::vector<V>& vertices, double (*temperedCost)(V, double), V (*getCandidate)(V), void (*analysis)(const std::vector<const V>&, const std::vector<double>&)=nullptr);
 
 // Assuming the return type is void for generateNeighbor and the arguments are as needed. Adjust if necessary.
 // Also, assuming generateNeighbor modifies its argument by reference.
