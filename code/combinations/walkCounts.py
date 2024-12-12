@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import math
 from walkLinearProgrammingSolutions import sufficient
+import scipy as scp
 
 split = np.array([
     [0,1,0],
@@ -76,6 +77,8 @@ for beta in betas:
         [0, 0, 0, 0, t, 1-t, 0],
         [0, 0, 0, 0, t, 0, 1-t],
     ])
+
+    print(scp.linalg.eig(HP))
 
     # for k in solutions:
     #     S, root, branch, leaf, total = solutions[k]
